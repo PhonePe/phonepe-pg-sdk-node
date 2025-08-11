@@ -101,8 +101,8 @@ client.getOrderStatus(merchantOrderId).then((response) => {
 PhonePe sends callbacks to your configured endpoint. Validate these callbacks to ensure they're authentic:
 
 ```javascript
-const authorizationHeaderData = "ef4c914c591698b268db3c64163eafda7209a630f236ebf0eebf045460df723a" // received in the response headers
-const phonepeS2SCallbackResponseBodyString = "{\"type\": \"PG_ORDER_COMPLETED\",\"payload\": {}}"  // callback body as string
+const authorizationHeaderData = "<FETCH_SHA_256_DATA_FROM_HEADER>" // received in the response headers
+const phonepeS2SCallbackResponseBodyString = "{\"type\": \"PG_ORDER_COMPLETED\",\"payload\": {}}"  // receiver in response body
   
 const usernameConfigured = "<MERCHANT_USERNAME>"
 const passwordConfigured = "<MERCHANT_PASSWORD>" 
