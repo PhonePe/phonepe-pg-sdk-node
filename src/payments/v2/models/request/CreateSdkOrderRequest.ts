@@ -31,6 +31,7 @@ export class CreateSdkOrderRequest {
   public metaInfo?: MetaInfo;
   public constraints?: InstrumentConstraint[];
   public expireAfter?: number;
+  public disablePaymentRetry?: boolean;
 
   public constructor(
     merchantOrderId: string,
@@ -38,7 +39,8 @@ export class CreateSdkOrderRequest {
     paymentFlow: PaymentFlow,
     metaInfo?: MetaInfo,
     expireAfter?: number,
-    constraints?: InstrumentConstraint[]
+    constraints?: InstrumentConstraint[],
+    disablePaymentRetry?: boolean
   ) {
     this.merchantOrderId = merchantOrderId;
     this.amount = amount;
@@ -46,6 +48,7 @@ export class CreateSdkOrderRequest {
     this.paymentFlow = paymentFlow;
     this.constraints = constraints;
     this.expireAfter = expireAfter;
+    this.disablePaymentRetry = disablePaymentRetry;
   }
 
   static StandardCheckoutBuilder = () => {
@@ -65,6 +68,7 @@ class CustomCheckoutBuilder {
   private _redirectUrl!: string;
   private _constraints?: InstrumentConstraint[];
   private _expireAfter?: number;
+  private _disablePaymentRetry?: boolean;
   /**
    * SETTERS
    */
@@ -103,6 +107,11 @@ class CustomCheckoutBuilder {
     return this;
   };
 
+  disablePaymentRetry = (disablePaymentRetry: boolean) => {
+    this._disablePaymentRetry = disablePaymentRetry;
+    return this;
+  };
+
   build = () => {
     const paymentFlow = PgCheckoutPaymentFlow.builder()
       .redirectUrl(this._redirectUrl)
@@ -114,7 +123,8 @@ class CustomCheckoutBuilder {
       paymentFlow,
       this._metaInfo,
       this._expireAfter,
-      this._constraints
+      this._constraints,
+      this._disablePaymentRetry
     );
   };
 }
@@ -126,6 +136,7 @@ class StandardCheckoutBuilder {
   private _message!: string;
   private _redirectUrl!: string;
   private _expireAfter?: number;
+  private _disablePaymentRetry?: boolean;
 
   /**
    * SETTERS
@@ -161,6 +172,11 @@ class StandardCheckoutBuilder {
     return this;
   };
 
+  disablePaymentRetry = (disablePaymentRetry: boolean) => {
+    this._disablePaymentRetry = disablePaymentRetry;
+    return this;
+  };
+
   build = () => {
     const paymentFlow = PgCheckoutPaymentFlow.builder()
       .redirectUrl(this._redirectUrl)
@@ -171,7 +187,9 @@ class StandardCheckoutBuilder {
       this._amount,
       paymentFlow,
       this._metaInfo,
-      this._expireAfter
+      this._expireAfter,
+      undefined,
+      this._disablePaymentRetry
     );
   };
 }
