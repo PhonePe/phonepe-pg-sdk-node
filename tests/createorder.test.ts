@@ -46,6 +46,27 @@ describe('STANDARD_CHECKOUT: CREATE_ORDER', () => {
     const result = await client.createSdkOrder(request);
     expect(result).toEqual(mockResponse);
   });
+
+  it('Create Order with disable retry Successfull', async () => {
+    const mockResponse = {
+      orderId: 'orderId',
+      expireAt: 3242342,
+      state: 'PENDING',
+      token: 'token',
+    };
+
+    mock
+      .onPost(`${hostUrl}${StandardCheckoutContants.CREATE_ORDER_API}`)
+      .reply(200, mockResponse);
+
+    const request = CreateSdkOrderRequest.StandardCheckoutBuilder()
+      .amount(100)
+      .merchantOrderId('merchantOrderId')
+      .disablePaymentRetry(true)
+      .build();
+    const result = await client.createSdkOrder(request);
+    expect(result).toEqual(mockResponse);
+  });
 });
 
 describe('CUSTOM_CHECKOUT: CREATE_ORDER', () => {
@@ -67,6 +88,27 @@ describe('CUSTOM_CHECKOUT: CREATE_ORDER', () => {
     const request = CreateSdkOrderRequest.StandardCheckoutBuilder()
       .amount(100)
       .merchantOrderId('merchantOrderId')
+      .build();
+    const result = await client.createSdkOrder(request);
+    expect(result).toEqual(mockResponse);
+  });
+
+  it('Create Order with disable retry Successfull', async () => {
+    const mockResponse = {
+      orderId: 'orderId',
+      expireAt: 3242342,
+      state: 'PENDING',
+      token: 'token',
+    };
+
+    mock
+      .onPost(`${hostUrl}${CustomCheckoutConstants.CREATE_ORDER_API}`)
+      .reply(200, mockResponse);
+
+    const request = CreateSdkOrderRequest.StandardCheckoutBuilder()
+      .amount(100)
+      .merchantOrderId('merchantOrderId')
+      .disablePaymentRetry(true)
       .build();
     const result = await client.createSdkOrder(request);
     expect(result).toEqual(mockResponse);
