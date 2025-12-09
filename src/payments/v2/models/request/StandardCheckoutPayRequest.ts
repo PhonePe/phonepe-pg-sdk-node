@@ -27,6 +27,7 @@ export class StandardCheckoutPayRequest {
   public paymentFlow: PaymentFlow;
   public metaInfo?: MetaInfo;
   public expireAfter?: number;
+  public disablePaymentRetry?: boolean
 
   public constructor(
     merchantOrderId: string,
@@ -34,7 +35,8 @@ export class StandardCheckoutPayRequest {
     metaInfo?: MetaInfo,
     message?: string,
     redirectUrl?: string,
-    expireAfter?: number
+    expireAfter?: number,
+    disablePaymentRetry?: boolean
   ) {
     this.merchantOrderId = merchantOrderId;
     this.amount = amount;
@@ -44,6 +46,7 @@ export class StandardCheckoutPayRequest {
       .message(message)
       .redirectUrl(redirectUrl)
       .build();
+    this.disablePaymentRetry = disablePaymentRetry;
   }
 
   public static builder(): StandardCheckoutPayRequestBuilder {
@@ -58,6 +61,7 @@ class StandardCheckoutPayRequestBuilder {
   private _redirectUrl?: string;
   private _message?: string;
   private _expireAfter?: number;
+  private _disablePaymentRetry?: boolean
 
   /**
    * Setters used for  builder
@@ -95,6 +99,11 @@ class StandardCheckoutPayRequestBuilder {
     return this;
   };
 
+  disablePaymentRetry = (disablePaymentRetry: boolean): StandardCheckoutPayRequestBuilder => {
+    this._disablePaymentRetry = disablePaymentRetry;
+    return this;
+  };
+
   build = (): StandardCheckoutPayRequest => {
     return new StandardCheckoutPayRequest(
       this._merchantOrderId,
@@ -102,7 +111,8 @@ class StandardCheckoutPayRequestBuilder {
       this._metaInfo,
       this._message,
       this._redirectUrl,
-      this._expireAfter
+      this._expireAfter,
+      this._disablePaymentRetry
     );
   };
 }

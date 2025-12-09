@@ -97,4 +97,19 @@ describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
     expect(payCalls.length).toEqual(4);
     expect(response).toEqual(payResponse);
   });
+
+  it('StandardCheckoutPayRequest with disablePaymentRetry', () => {
+    const requestWithDisableRetry = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order123')
+      .amount(100)
+      .disablePaymentRetry(true)
+      .build();
+    expect(requestWithDisableRetry.disablePaymentRetry).toBe(true);
+
+    const requestWithoutDisableRetry = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order456')
+      .amount(200)
+      .build();
+    expect(requestWithoutDisableRetry.disablePaymentRetry).toBeUndefined();
+  });
 });
