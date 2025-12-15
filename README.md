@@ -154,6 +154,31 @@ client.createSdkOrder(request).then((response) => {
 })
 
 // Pass this token to your mobile app to initiate payment through the PhonePe SDK
+
+#### Disabling Payment Retry
+
+You can disable the payment retry option for a transaction by setting `disablePaymentRetry` to `true`. This is applicable for both `StandardCheckoutPayRequest` and `CreateSdkOrderRequest`.
+
+For `StandardCheckoutPayRequest`:
+
+```javascript
+const request = StandardCheckoutPayRequest.builder()
+        .merchantOrderId(merchantOrderId)
+        .amount(amount)
+        .redirectUrl(redirectUrl)
+        .disablePaymentRetry(true) // Set to true to disable payment retry
+        .build();
+```
+
+For `CreateSdkOrderRequest`:
+
+```javascript
+const request = CreateSdkOrderRequest.StandardCheckoutBuilder()
+        .merchantOrderId(merchantOrderId)
+        .amount(amount)
+        .redirectUrl(redirectUrl)
+        .disablePaymentRetry(true) // Set to true to disable payment retry
+        .build();
 ```
 
 ## Documentation
