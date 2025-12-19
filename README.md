@@ -31,7 +31,7 @@ A Node package for seamless integration with PhonePe Payment Gateway APIs.
 Install the dependency using npm:
 
 ```javascript
-npm i https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node.tgz
+npm i https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node-2.0.3.tgz
 ```
 
 ## Quick Start
