@@ -15,12 +15,18 @@
  */
 
 import { StandardCheckoutPayRequest } from '../src/payments/v2/models/request/StandardCheckoutPayRequest';
+import { PrefillUserLoginDetails } from '../src/payments/v2/models/request/PrefillUserLoginDetails';
 import { PhonePeException } from '../src/common/exception/Exceptions';
 import { TokenService } from '../src/common/tokenhandler/TokenService';
 import { setupBeforeAndAfter, standardCheckoutClient } from './baseSetup';
+import { EnvConfig } from '../src/EnvConfig';
+import { Env } from '../src/Env';
+import { StandardCheckoutContants } from '../src/payments/v2/standardcheckout/Constants';
 
 describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
   const mock = setupBeforeAndAfter();
+
+  const payUrl = `${EnvConfig.getBaseUrls(Env.SANDBOX).pgHostUrl}${StandardCheckoutContants.PAY_API}`;
 
   it('Sigleton via Get Instance', async () => {
     const { client: client1 } = standardCheckoutClient();
@@ -42,7 +48,6 @@ describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
   });
 
   it('Multiple Client but Single Auth Call', async () => {
-    TokenService.oAuthResponse = null;
     const req = StandardCheckoutPayRequest.builder()
       .merchantOrderId('merchantOrderId')
       .amount(100)
@@ -59,7 +64,7 @@ describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
       access_token: 'access_token',
       encrypted_access_token: 'encrypted_access_token',
       issued_at: time,
-      expires_at: time + 6,
+      expires_at: time + 3600, // 1 hour validity to avoid race with background event publisher
       token_type: 'token_type',
     };
 
@@ -75,6 +80,11 @@ describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
     mock
       .onPost('https://api-preprod.phonepe.com/apis/pg-sandbox/checkout/v2/pay')
       .reply(200, payResponse);
+
+    // Reset token and history immediately before pay() calls so any background
+    // event-publisher activity is excluded from the assertion window.
+    TokenService.oAuthResponse = null;
+    mock.resetHistory();
 
     let response = await client1.pay(req);
     response = await client2.pay(req);
@@ -111,5 +121,102 @@ describe('STANDARD_CHECKOUT: SINGLETON TEST', () => {
       .amount(200)
       .build();
     expect(requestWithoutDisableRetry.disablePaymentRetry).toBeUndefined();
+  });
+
+  it('StandardCheckoutPayRequest with prefillUserLoginDetails set', () => {
+    const prefill = PrefillUserLoginDetails.builder()
+      .phoneNumber('9999999999')
+      .build();
+
+    const request = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order123')
+      .amount(100)
+      .prefillUserLoginDetails(prefill)
+      .build();
+
+    expect(request.prefillUserLoginDetails).toBeDefined();
+    expect(request.prefillUserLoginDetails!.phoneNumber).toEqual('9999999999');
+  });
+
+  it('StandardCheckoutPayRequest without prefillUserLoginDetails', () => {
+    const request = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order456')
+      .amount(200)
+      .build();
+
+    expect(request.prefillUserLoginDetails).toBeUndefined();
+  });
+
+  it('prefillUserLoginDetails is included in JSON request body', async () => {
+    const { client } = standardCheckoutClient();
+
+    const prefill = PrefillUserLoginDetails.builder()
+      .phoneNumber('9999999999')
+      .build();
+
+    const request = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order123')
+      .amount(100)
+      .prefillUserLoginDetails(prefill)
+      .build();
+
+    mock.onPost(payUrl).reply(200, { state: 'PENDING', orderId: 'orderId', expireAt: 4353534 });
+
+    try {
+      await client.pay(request);
+    } catch (error) {}
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    const requestBody = JSON.parse(payCall!.data);
+    expect(requestBody).toHaveProperty('prefillUserLoginDetails');
+    expect(requestBody.prefillUserLoginDetails.phoneNumber).toEqual('9999999999');
+  });
+
+  it('prefillUserLoginDetails is absent in JSON body when not set', async () => {
+    const { client } = standardCheckoutClient();
+
+    const request = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order456')
+      .amount(200)
+      .build();
+
+    mock.onPost(payUrl).reply(200, { state: 'PENDING', orderId: 'orderId', expireAt: 4353534 });
+
+    try {
+      await client.pay(request);
+    } catch (error) {}
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    const requestBody = JSON.parse(payCall!.data);
+    expect(requestBody.prefillUserLoginDetails).toBeUndefined();
+  });
+
+  it('pay with both prefillUserLoginDetails and disablePaymentRetry set', async () => {
+    const { client } = standardCheckoutClient();
+
+    const prefill = PrefillUserLoginDetails.builder()
+      .phoneNumber('8888888888')
+      .build();
+
+    const request = StandardCheckoutPayRequest.builder()
+      .merchantOrderId('order789')
+      .amount(2000)
+      .disablePaymentRetry(true)
+      .prefillUserLoginDetails(prefill)
+      .build();
+
+    mock.onPost(payUrl).reply(200, { state: 'PENDING', orderId: 'orderId', expireAt: 4353534 });
+
+    try {
+      await client.pay(request);
+    } catch (error) {}
+
+    expect(request.disablePaymentRetry).toBe(true);
+    expect(request.prefillUserLoginDetails!.phoneNumber).toEqual('8888888888');
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    const requestBody = JSON.parse(payCall!.data);
+    expect(requestBody.disablePaymentRetry).toBe(true);
+    expect(requestBody.prefillUserLoginDetails.phoneNumber).toEqual('8888888888');
   });
 });

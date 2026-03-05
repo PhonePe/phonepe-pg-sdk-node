@@ -30,6 +30,7 @@ export class UpiCollectPayViaVpaRequestBuilder {
   private _vpa!: string;
   private _message?: string;
   private _expireAfter?: number;
+  private _deviceOS?: string;
 
   /**
    * SETTERS
@@ -70,6 +71,11 @@ export class UpiCollectPayViaVpaRequestBuilder {
     return this;
   };
 
+  deviceOS = (xDeviceOs: string) => {
+    this._deviceOS = xDeviceOs;
+    return this;
+  };
+
   build = () => {
     const paymentFlow: PaymentFlow = PgPaymentFlow.builder()
       .paymentMode(
@@ -86,7 +92,9 @@ export class UpiCollectPayViaVpaRequestBuilder {
       paymentFlow,
       this._expireAfter,
       this._metaInfo,
-      this._constraints
+      this._constraints,
+      undefined,
+      this._deviceOS
     );
   };
 }

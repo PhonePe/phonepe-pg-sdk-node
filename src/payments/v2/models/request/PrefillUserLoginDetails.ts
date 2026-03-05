@@ -14,10 +14,27 @@
  *  limitations under the License.
  */
 
-export * from './CreateSdkOrderRequest';
-export * from './CustomCheckoutPayRequest';
-export * from './StandardCheckoutPayRequest';
-export * from './MerchantUrls';
-export * from './PgCheckoutPaymentFlow';
-export * from './PgPaymentFlow';
-export * from './PrefillUserLoginDetails';
+export class PrefillUserLoginDetails {
+  public phoneNumber?: string;
+
+  public constructor(phoneNumber?: string) {
+    this.phoneNumber = phoneNumber;
+  }
+
+  public static builder(): PrefillUserLoginDetailsBuilder {
+    return new PrefillUserLoginDetailsBuilder();
+  }
+}
+
+class PrefillUserLoginDetailsBuilder {
+  private _phoneNumber?: string;
+
+  phoneNumber = (phoneNumber: string): PrefillUserLoginDetailsBuilder => {
+    this._phoneNumber = phoneNumber;
+    return this;
+  };
+
+  build = (): PrefillUserLoginDetails => {
+    return new PrefillUserLoginDetails(this._phoneNumber);
+  };
+}

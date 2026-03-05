@@ -42,6 +42,7 @@ export class CustomCheckoutPayRequest {
   public constraints?: InstrumentConstraint[];
   public deviceContext?: DeviceContext;
   public expireAfter?: number;
+  public deviceOS?: string;
 
   public constructor(
     merchantOrderId: string,
@@ -50,7 +51,8 @@ export class CustomCheckoutPayRequest {
     expireAfter?: number,
     metaInfo?: MetaInfo,
     constrainsts?: InstrumentConstraint[],
-    deviceContext?: DeviceContext
+    deviceContext?: DeviceContext,
+    deviceOS?: string
   ) {
     this.merchantOrderId = merchantOrderId;
     this.amount = amount;
@@ -59,6 +61,12 @@ export class CustomCheckoutPayRequest {
     this.constraints = constrainsts;
     this.deviceContext = deviceContext;
     this.expireAfter = expireAfter;
+    this.deviceOS = deviceOS;
+  }
+
+  toJSON() {
+    const { deviceOS, ...rest } = this;
+    return rest;
   }
 
   static UpiIntentPayRequestBuilder() {

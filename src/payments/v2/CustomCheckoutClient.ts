@@ -132,13 +132,16 @@ export class CustomCheckoutClient extends BaseClient {
     payRequest: CustomCheckoutPayRequest
   ): Promise<CustomCheckoutPayResponse> => {
     const url: string = CustomCheckoutConstants.PAY_API;
+    const headers = payRequest.deviceOS
+      ? { ...this.headers, [Headers.X_DEVICE_OS]: payRequest.deviceOS }
+      : this.headers;
     try {
       const response =
         await this.requestViaAuthRefresh<CustomCheckoutPayResponse>(
           HttpMethodType.POST,
           url,
           CustomCheckoutPayResponse,
-          this.headers,
+          headers,
           payRequest
         );
       this.eventPublisher.send(
