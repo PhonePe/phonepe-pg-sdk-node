@@ -54,15 +54,7 @@ export class StandardCheckoutPayRequest {
   }
 
   toJSON() {
-    return {
-      merchantOrderId: this.merchantOrderId,
-      amount: this.amount,
-      paymentFlow: this.paymentFlow,
-      metaInfo: this.metaInfo,
-      expireAfter: this.expireAfter,
-      disablePaymentRetry: this.disablePaymentRetry,
-      prefillUserLoginDetails: this.prefillUserLoginDetails,
-    };
+    return { ...this };
   }
 
   public static builder(): StandardCheckoutPayRequestBuilder {

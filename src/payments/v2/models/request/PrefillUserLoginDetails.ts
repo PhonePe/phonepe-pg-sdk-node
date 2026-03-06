@@ -15,6 +15,11 @@
  */
 
 export class PrefillUserLoginDetails {
+  /**
+   * The user's mobile number to pre-fill on the PhonePe payment page.
+   * Expected format: 10-digit Indian mobile number (e.g. "9876543210"),
+   * or E.164 format with country code (e.g. "+919876543210").
+   */
   public phoneNumber?: string;
 
   public constructor(phoneNumber?: string) {
