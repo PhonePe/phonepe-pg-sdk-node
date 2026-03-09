@@ -14,10 +14,12 @@
  *  limitations under the License.
  */
 
+import { version } from '../../../package.json';
+
 export class Headers {
   static readonly INTEGRATION: string = 'API';
   static readonly API_VERSION: string = 'V2';
-  static readonly SDK_VERSION: string = '2.0.4';
+  static readonly SDK_VERSION: string = version;
   static readonly SDK_TYPE: string = 'BACKEND_NODE_SDK';
   static readonly SOURCE: string = 'x-source';
   static readonly SOURCE_VERSION: string = 'x-source-version';

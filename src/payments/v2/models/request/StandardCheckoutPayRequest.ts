@@ -53,10 +53,6 @@ export class StandardCheckoutPayRequest {
     this.prefillUserLoginDetails = prefillUserLoginDetails;
   }
 
-  toJSON() {
-    return { ...this };
-  }
-
   public static builder(): StandardCheckoutPayRequestBuilder {
     return new StandardCheckoutPayRequestBuilder();
   }

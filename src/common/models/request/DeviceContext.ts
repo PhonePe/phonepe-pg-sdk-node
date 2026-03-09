@@ -29,14 +29,14 @@ export class DeviceContext {
 }
 
 class DeviceContextBuilder {
-  private _deviveOS?: string;
+  private _deviceOS?: string;
   private _merchantCallBackScheme?: string;
 
   /**
    * SETTERS
    */
   deviceOS = (deviceOS?: string): DeviceContextBuilder => {
-    this._deviveOS = deviceOS;
+    this._deviceOS = deviceOS;
     return this;
   };
 
@@ -48,6 +48,6 @@ class DeviceContextBuilder {
   };
 
   build = (): DeviceContext => {
-    return new DeviceContext(this._deviveOS, this._merchantCallBackScheme);
+    return new DeviceContext(this._deviceOS, this._merchantCallBackScheme);
   };
 }
