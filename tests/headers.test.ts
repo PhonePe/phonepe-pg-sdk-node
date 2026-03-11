@@ -1,4 +1,4 @@
-/* 
+/*
  *  Copyright (c) 2025 Original Author(s), PhonePe India Pvt. Ltd.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,17 @@
  *  limitations under the License.
  */
 
-export * from './CreateSdkOrderRequest';
-export * from './CustomCheckoutPayRequest';
-export * from './StandardCheckoutPayRequest';
-export * from './MerchantUrls';
-export * from './PgCheckoutPaymentFlow';
-export * from './PgPaymentFlow';
-export * from './PrefillUserLoginDetails';
+import { Headers } from '../src/common/constants/Headers';
+import { version } from '../package.json';
+
+describe('Headers', () => {
+  it('should derive SDK_VERSION from package.json', () => {
+    expect(Headers.SDK_VERSION).toBe(version);
+  });
+
+  it('should keep SDK_VERSION in sync when package.json version changes', () => {
+    // Ensures no hardcoded version diverges from the package manifest
+    expect(Headers.SDK_VERSION).toMatch(/^\d+\.\d+\.\d+/);
+    expect(Headers.SDK_VERSION).toBe(version);
+  });
+});

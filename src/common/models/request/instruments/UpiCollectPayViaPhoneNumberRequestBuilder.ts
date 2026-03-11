@@ -30,6 +30,7 @@ export class UpiCollectPayViaPhoneNumberRequestBuilder {
   private _phoneNumber!: string;
   private _message?: string;
   private _expireAfter?: number;
+  private _deviceOS?: string;
 
   /**
    * SETTERS
@@ -70,6 +71,11 @@ export class UpiCollectPayViaPhoneNumberRequestBuilder {
     return this;
   };
 
+  deviceOS = (xDeviceOs: string) => {
+    this._deviceOS = xDeviceOs;
+    return this;
+  };
+
   build = () => {
     const paymentFlow: PaymentFlow = PgPaymentFlow.builder()
       .paymentMode(
@@ -90,7 +96,9 @@ export class UpiCollectPayViaPhoneNumberRequestBuilder {
       paymentFlow,
       this._expireAfter,
       this._metaInfo,
-      this._constraints
+      this._constraints,
+      undefined,
+      this._deviceOS
     );
   };
 }

@@ -18,9 +18,16 @@ import { PhonePeException } from '../src/common/exception/Exceptions';
 import { TokenService } from '../src/common/tokenhandler/TokenService';
 import { CustomCheckoutPayRequest } from '../src/payments/v2/models/request/CustomCheckoutPayRequest';
 import { customCheckoutClient, setupBeforeAndAfter } from './baseSetup';
+import { Headers } from '../src/common/constants/Headers';
+import { CustomCheckoutConstants } from '../src/payments/v2/customcheckout/Constants';
+import { EnvConfig } from '../src/EnvConfig';
+import { Env } from '../src/Env';
+
+// Single shared mock adapter for the entire file so all axios.create() instances
+// (including the singleton client) use the same adapter and history.
+const mock = setupBeforeAndAfter();
 
 describe('CUSTOM_CHECKOUT: SINGLETON TEST', () => {
-  const mock = setupBeforeAndAfter();
 
   it('Singleton via Get Instance', async () => {
     const { client: client1 } = customCheckoutClient();
@@ -42,7 +49,6 @@ describe('CUSTOM_CHECKOUT: SINGLETON TEST', () => {
   });
 
   it('Multiple Client but Single Auth Call', async () => {
-    TokenService.oAuthResponse = null;
     const req = CustomCheckoutPayRequest.UpiIntentPayRequestBuilder()
       .merchantOrderId('merchantOrderId')
       .amount(100)
@@ -60,7 +66,7 @@ describe('CUSTOM_CHECKOUT: SINGLETON TEST', () => {
       access_token: 'access_token',
       encrypted_access_token: 'encrypted_access_token',
       issued_at: time,
-      expires_at: time + 6,
+      expires_at: time + 3600, // 1 hour validity to avoid race with background event publisher
       token_type: 'token_type',
     };
 
@@ -76,6 +82,11 @@ describe('CUSTOM_CHECKOUT: SINGLETON TEST', () => {
     mock
       .onPost('https://api-preprod.phonepe.com/apis/pg-sandbox/payments/v2/pay')
       .reply(200, payResponse);
+
+    // Reset token and history immediately before pay() calls so any background
+    // event-publisher activity is excluded from the assertion window.
+    TokenService.oAuthResponse = null;
+    mock.resetHistory();
 
     try {
       let response = await client1.pay(req);
@@ -97,5 +108,72 @@ describe('CUSTOM_CHECKOUT: SINGLETON TEST', () => {
 
     expect(authCalls.length).toEqual(1); //Only one OAuth fetch call
     expect(payCalls.length).toEqual(4);
+  });
+});
+
+describe('CUSTOM_CHECKOUT: X-DEVICE-OS HEADER TESTS', () => {
+  const payUrl = `${EnvConfig.getBaseUrls(Env.SANDBOX).pgHostUrl}${CustomCheckoutConstants.PAY_API}`;
+
+  const mockPayResponse = {
+    state: 'PENDING',
+    orderId: 'orderId',
+    expireAt: 4353534,
+  };
+
+  it('sends x-device-os header for UPI_COLLECT request', async () => {
+    const { client } = customCheckoutClient();
+    const payRequest = CustomCheckoutPayRequest.UpiCollectPayViaVpaRequestBuilder()
+      .merchantOrderId('merchantOrderId')
+      .amount(100)
+      .vpa('test@upi')
+      .deviceOS('ANDROID')
+      .build();
+
+    mock.onPost(payUrl).reply(200, mockPayResponse);
+
+    try {
+      await client.pay(payRequest);
+    } catch (error) {}
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    expect(payCall!.headers![Headers.X_DEVICE_OS]).toEqual('ANDROID');
+  });
+
+  it('does not send x-device-os header when not set', async () => {
+    const { client } = customCheckoutClient();
+    const payRequest = CustomCheckoutPayRequest.UpiCollectPayViaVpaRequestBuilder()
+      .merchantOrderId('merchantOrderId')
+      .amount(100)
+      .vpa('test@upi')
+      .build();
+
+    mock.onPost(payUrl).reply(200, mockPayResponse);
+
+    try {
+      await client.pay(payRequest);
+    } catch (error) {}
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    expect(payCall!.headers![Headers.X_DEVICE_OS]).toBeUndefined();
+  });
+
+  it('x-device-os is not in JSON request body', async () => {
+    const { client } = customCheckoutClient();
+    const payRequest = CustomCheckoutPayRequest.UpiCollectPayViaVpaRequestBuilder()
+      .merchantOrderId('merchantOrderId')
+      .amount(100)
+      .vpa('test@upi')
+      .deviceOS('ANDROID')
+      .build();
+
+    mock.onPost(payUrl).reply(200, mockPayResponse);
+
+    try {
+      await client.pay(payRequest);
+    } catch (error) {}
+
+    const payCall = mock.history.post.find((call) => call.url === payUrl);
+    const requestBody = JSON.parse(payCall!.data);
+    expect(requestBody).not.toHaveProperty('deviceOS');
   });
 });

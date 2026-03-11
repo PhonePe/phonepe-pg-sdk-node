@@ -17,6 +17,7 @@
 import { MetaInfo } from '../../../../common/models/MetaInfo';
 import { PaymentFlow } from '../../../../common/models/PaymentFlow';
 import { PgCheckoutPaymentFlow } from './PgCheckoutPaymentFlow';
+import { PrefillUserLoginDetails } from './PrefillUserLoginDetails';
 
 /**
  * Creates a request using the builder -> StandardCheckoutPayRequest.builder()
@@ -28,6 +29,7 @@ export class StandardCheckoutPayRequest {
   public metaInfo?: MetaInfo;
   public expireAfter?: number;
   public disablePaymentRetry?: boolean
+  public prefillUserLoginDetails?: PrefillUserLoginDetails;
 
   public constructor(
     merchantOrderId: string,
@@ -36,7 +38,8 @@ export class StandardCheckoutPayRequest {
     message?: string,
     redirectUrl?: string,
     expireAfter?: number,
-    disablePaymentRetry?: boolean
+    disablePaymentRetry?: boolean,
+    prefillUserLoginDetails?: PrefillUserLoginDetails
   ) {
     this.merchantOrderId = merchantOrderId;
     this.amount = amount;
@@ -47,6 +50,7 @@ export class StandardCheckoutPayRequest {
       .redirectUrl(redirectUrl)
       .build();
     this.disablePaymentRetry = disablePaymentRetry;
+    this.prefillUserLoginDetails = prefillUserLoginDetails;
   }
 
   public static builder(): StandardCheckoutPayRequestBuilder {
@@ -62,6 +66,7 @@ class StandardCheckoutPayRequestBuilder {
   private _message?: string;
   private _expireAfter?: number;
   private _disablePaymentRetry?: boolean
+  private _prefillUserLoginDetails?: PrefillUserLoginDetails;
 
   /**
    * Setters used for  builder
@@ -104,6 +109,11 @@ class StandardCheckoutPayRequestBuilder {
     return this;
   };
 
+  prefillUserLoginDetails = (prefillUserLoginDetails: PrefillUserLoginDetails): StandardCheckoutPayRequestBuilder => {
+    this._prefillUserLoginDetails = prefillUserLoginDetails;
+    return this;
+  };
+
   build = (): StandardCheckoutPayRequest => {
     return new StandardCheckoutPayRequest(
       this._merchantOrderId,
@@ -112,7 +122,8 @@ class StandardCheckoutPayRequestBuilder {
       this._message,
       this._redirectUrl,
       this._expireAfter,
-      this._disablePaymentRetry
+      this._disablePaymentRetry,
+      this._prefillUserLoginDetails
     );
   };
 }
