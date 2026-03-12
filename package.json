@@ -1,8 +1,13 @@
 {
-  "name": "pg-sdk-node",
+  "name": "@phonepe-pg/pg-sdk-node",
   "version": "2.0.4",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist/src",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "npm run lint && jest --config jest.config.ts",
     "clean": "rimraf dist",

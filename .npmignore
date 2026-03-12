@@ -1,0 +1,19 @@
+# Source (dist/ is what consumers get)
+src/
+tests/
+coverage/
+
+# Config files
+tsconfig.json
+jest.config.ts
+.eslintrc.js
+.prettierrc*
+
+# CI / GitHub
+.github/
+
+# Dev artifacts
+node_modules/
+*.log
+.DS_Store
+.env
