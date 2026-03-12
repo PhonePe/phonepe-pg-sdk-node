@@ -1,8 +1,13 @@
 {
-  "name": "pg-sdk-node",
-  "version": "2.0.4",
+  "name": "@phonepe-pg/pg-sdk-node",
+  "version": "2.0.5",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "test": "npm run lint && jest --config jest.config.ts",
     "clean": "rimraf dist",
@@ -21,7 +26,7 @@
   "description": "Official Node SDK for PhonePe API",
   "repository": {
     "type": "git",
-    "url": "https://github.com/phonepe/phonepe-pg-sdk-node.git"
+    "url": "https://github.com/PhonePe/phonepe-pg-sdk-node.git"
   },
   "devDependencies": {
     "@types/jest": "^28.1.1",

@@ -30,8 +30,8 @@ A Node package for seamless integration with PhonePe Payment Gateway APIs.
 
 Install the dependency using npm:
 
-```javascript
-npm i https://phonepe.mycloudrepo.io/public/repositories/phonepe-pg-sdk-node/releases/v2/phonepe-pg-sdk-node-2.0.3.tgz
+```bash
+npm i @phonepe-pg/pg-sdk-node
 ```
 
 ## Quick Start
@@ -46,7 +46,7 @@ You need three key pieces of information:
 3. `clientVersion` - API version to use
 
 ```javascript
-import {StandardCheckoutClient, Env} from 'pg-sdk-node';
+import {StandardCheckoutClient, Env} from '@phonepe-pg/pg-sdk-node';
  
 const clientId = "<clientId>";
 const clientSecret = "<clientSecret>";
@@ -61,7 +61,7 @@ const client = StandardCheckoutClient.getInstance(clientId, clientSecret, client
 To initiate a payment, create a request using `StandardCheckoutPayRequest.builder()`:
 
 ```javascript
-import {StandardCheckoutPayRequest} from 'pg-sdk-node';
+import {StandardCheckoutPayRequest} from '@phonepe-pg/pg-sdk-node';
 import {randomUUID} from 'crypto';
   
 const merchantOrderId = randomUUID();
@@ -129,7 +129,7 @@ try {
 For mobile SDK integration, first create an order on your server:
 
 ```javascript
-import {StandardCheckoutClient, Env, CreateSdkOrderRequest} from 'pg-sdk-node';
+import {StandardCheckoutClient, Env, CreateSdkOrderRequest} from '@phonepe-pg/pg-sdk-node';
 import {randomUUID} from 'crypto';
  
 const clientId = "<clientId>";
