@@ -29,6 +29,8 @@ import { OrderStatusResponse } from '../../common/models/response/OrderStatusRes
 import { RefundResponse } from '../../common/models/response/RefundResponse';
 import { RefundStatusResponse } from '../../common/models/response/RefundStatusResponse';
 import { PaymentFlowType } from '../../common/models/PaymentFlowType';
+import { PgPaymentFlow } from './models/request/PgPaymentFlow';
+import { PgV2InstrumentType } from '../../common/models/PgV2InstrumentType';
 import { CreateSdkOrderRequest } from './models/request/CreateSdkOrderRequest';
 import { CreateSdkOrderResponse } from './models/response/CreateSdkOrderResponse';
 import { Constants } from '../../common/exception/Constants';
@@ -135,15 +137,27 @@ export class CustomCheckoutClient extends BaseClient {
     const headers = payRequest.deviceOS
       ? { ...this.headers, [Headers.X_DEVICE_OS]: payRequest.deviceOS }
       : this.headers;
-    try {
-      const response =
-        await this.requestViaAuthRefresh<CustomCheckoutPayResponse>(
+    const isPciInstrument = (request: CustomCheckoutPayRequest): boolean => {
+      const type = (request.paymentFlow as PgPaymentFlow)?.paymentMode?.type;
+      return type === PgV2InstrumentType.CARD || type === PgV2InstrumentType.TOKEN;
+    };
+    const request = isPciInstrument(payRequest)
+      ? this.requestViaAuthRefreshPci<CustomCheckoutPayResponse>(
+          HttpMethodType.POST,
+          url,
+          CustomCheckoutPayResponse,
+          headers,
+          payRequest
+        )
+      : this.requestViaAuthRefresh<CustomCheckoutPayResponse>(
           HttpMethodType.POST,
           url,
           CustomCheckoutPayResponse,
           headers,
           payRequest
         );
+    try {
+      const response = await request;
       this.eventPublisher.send(
         buildCustomCheckoutPayRequest(
           EventState.SUCCESS,

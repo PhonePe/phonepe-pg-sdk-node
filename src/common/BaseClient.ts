@@ -34,6 +34,7 @@ export abstract class BaseClient {
   private readonly _tokenService: TokenService;
   private readonly _merchantConfig: CredentialConfig;
   private readonly _httpCommand: HttpCommand;
+  private readonly _pciHttpCommand: HttpCommand;
   private readonly _httpClient: AxiosInstance;
   private readonly _shouldPublishEvents: boolean;
   private readonly _eventPublisherFactory: EventPublisherFactory;
@@ -58,6 +59,10 @@ export abstract class BaseClient {
     });
     this._httpCommand = new HttpCommand(
       EnvConfig.getBaseUrls(env).pgHostUrl,
+      this._httpClient
+    );
+    this._pciHttpCommand = new HttpCommand(
+      EnvConfig.getBaseUrls(env).pciPgHostUrl,
       this._httpClient
     );
     this._shouldPublishEvents = shouldPublishEvents;
@@ -87,6 +92,33 @@ export abstract class BaseClient {
     const httpHeaders = await this.addAuthHeader(headers);
     try {
       const response = await this._httpCommand.request<T>(
+        url,
+        method,
+        httpHeaders,
+        data,
+        pathParams
+      );
+      const deserializedResponse = plainToClass(responseType, response);
+      return deserializedResponse;
+    } catch (error) {
+      if (error instanceof UnauthorizedAccess) {
+        await this.tokenService.forceRefreshToken();
+      }
+      throw error;
+    }
+  };
+
+  protected requestViaAuthRefreshPci = async <T>(
+    method: HttpMethodType,
+    url: string,
+    responseType: ClassType<T>,
+    headers: { [key: string]: string },
+    data?: object,
+    pathParams?: { [key: string]: string }
+  ): Promise<T> => {
+    const httpHeaders = await this.addAuthHeader(headers);
+    try {
+      const response = await this._pciHttpCommand.request<T>(
         url,
         method,
         httpHeaders,

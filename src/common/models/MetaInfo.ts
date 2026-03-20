@@ -20,19 +20,49 @@ export class MetaInfo {
   public udf3?: string;
   public udf4?: string;
   public udf5?: string;
+  public udf6?: string;
+  public udf7?: string;
+  public udf8?: string;
+  public udf9?: string;
+  public udf10?: string;
+  public udf11?: string;
+  public udf12?: string;
+  public udf13?: string;
+  public udf14?: string;
+  public udf15?: string;
 
   public constructor(
-    udf1: string,
-    udf2: string,
-    udf3: string,
-    udf4: string,
-    udf5: string
+    udf1?: string,
+    udf2?: string,
+    udf3?: string,
+    udf4?: string,
+    udf5?: string,
+    udf6?: string,
+    udf7?: string,
+    udf8?: string,
+    udf9?: string,
+    udf10?: string,
+    udf11?: string,
+    udf12?: string,
+    udf13?: string,
+    udf14?: string,
+    udf15?: string
   ) {
     this.udf1 = udf1;
     this.udf2 = udf2;
     this.udf3 = udf3;
     this.udf4 = udf4;
     this.udf5 = udf5;
+    this.udf6 = udf6;
+    this.udf7 = udf7;
+    this.udf8 = udf8;
+    this.udf9 = udf9;
+    this.udf10 = udf10;
+    this.udf11 = udf11;
+    this.udf12 = udf12;
+    this.udf13 = udf13;
+    this.udf14 = udf14;
+    this.udf15 = udf15;
   }
 
   public static builder() {
@@ -41,11 +71,21 @@ export class MetaInfo {
 }
 
 class MetaInfoBuilder {
-  private _udf1!: string;
-  private _udf2!: string;
-  private _udf3!: string;
-  private _udf4!: string;
-  private _udf5!: string;
+  private _udf1?: string;
+  private _udf2?: string;
+  private _udf3?: string;
+  private _udf4?: string;
+  private _udf5?: string;
+  private _udf6?: string;
+  private _udf7?: string;
+  private _udf8?: string;
+  private _udf9?: string;
+  private _udf10?: string;
+  private _udf11?: string;
+  private _udf12?: string;
+  private _udf13?: string;
+  private _udf14?: string;
+  private _udf15?: string;
 
   /**
    * SETTERS
@@ -76,13 +116,73 @@ class MetaInfoBuilder {
     return this;
   };
 
+  udf6 = (udf6: string): MetaInfoBuilder => {
+    this._udf6 = udf6;
+    return this;
+  };
+
+  udf7 = (udf7: string): MetaInfoBuilder => {
+    this._udf7 = udf7;
+    return this;
+  };
+
+  udf8 = (udf8: string): MetaInfoBuilder => {
+    this._udf8 = udf8;
+    return this;
+  };
+
+  udf9 = (udf9: string): MetaInfoBuilder => {
+    this._udf9 = udf9;
+    return this;
+  };
+
+  udf10 = (udf10: string): MetaInfoBuilder => {
+    this._udf10 = udf10;
+    return this;
+  };
+
+  udf11 = (udf11: string): MetaInfoBuilder => {
+    this._udf11 = udf11;
+    return this;
+  };
+
+  udf12 = (udf12: string): MetaInfoBuilder => {
+    this._udf12 = udf12;
+    return this;
+  };
+
+  udf13 = (udf13: string): MetaInfoBuilder => {
+    this._udf13 = udf13;
+    return this;
+  };
+
+  udf14 = (udf14: string): MetaInfoBuilder => {
+    this._udf14 = udf14;
+    return this;
+  };
+
+  udf15 = (udf15: string): MetaInfoBuilder => {
+    this._udf15 = udf15;
+    return this;
+  };
+
   build = (): MetaInfo => {
     return new MetaInfo(
       this._udf1,
       this._udf2,
       this._udf3,
       this._udf4,
-      this._udf5
+      this._udf5,
+      this._udf6,
+      this._udf7,
+      this._udf8,
+      this._udf9,
+      this._udf10,
+      this._udf11,
+      this._udf12,
+      this._udf13,
+      this._udf14,
+      this._udf15
     );
   };
 }
