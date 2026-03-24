@@ -89,23 +89,7 @@ export abstract class BaseClient {
     data?: object,
     pathParams?: { [key: string]: string }
   ): Promise<T> => {
-    const httpHeaders = await this.addAuthHeader(headers);
-    try {
-      const response = await this._httpCommand.request<T>(
-        url,
-        method,
-        httpHeaders,
-        data,
-        pathParams
-      );
-      const deserializedResponse = plainToClass(responseType, response);
-      return deserializedResponse;
-    } catch (error) {
-      if (error instanceof UnauthorizedAccess) {
-        await this.tokenService.forceRefreshToken();
-      }
-      throw error;
-    }
+    return this.executeWithRetry(this._httpCommand, method, url, responseType, headers, data, pathParams);
   };
 
   protected requestViaAuthRefreshPci = async <T>(
@@ -116,20 +100,28 @@ export abstract class BaseClient {
     data?: object,
     pathParams?: { [key: string]: string }
   ): Promise<T> => {
+    return this.executeWithRetry(this._pciHttpCommand, method, url, responseType, headers, data, pathParams);
+  };
+
+  private executeWithRetry = async <T>(
+    httpCommand: HttpCommand,
+    method: HttpMethodType,
+    url: string,
+    responseType: ClassType<T>,
+    headers: { [key: string]: string },
+    data?: object,
+    pathParams?: { [key: string]: string }
+  ): Promise<T> => {
     const httpHeaders = await this.addAuthHeader(headers);
     try {
-      const response = await this._pciHttpCommand.request<T>(
-        url,
-        method,
-        httpHeaders,
-        data,
-        pathParams
-      );
-      const deserializedResponse = plainToClass(responseType, response);
-      return deserializedResponse;
+      const response = await httpCommand.request<T>(url, method, httpHeaders, data, pathParams);
+      return plainToClass(responseType, response);
     } catch (error) {
       if (error instanceof UnauthorizedAccess) {
         await this.tokenService.forceRefreshToken();
+        const retryHeaders = await this.addAuthHeader(headers);
+        const retryResponse = await httpCommand.request<T>(url, method, retryHeaders, data, pathParams);
+        return plainToClass(responseType, retryResponse);
       }
       throw error;
     }

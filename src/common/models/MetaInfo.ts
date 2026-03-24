@@ -167,6 +167,21 @@ class MetaInfoBuilder {
   };
 
   build = (): MetaInfo => {
+    this.validateSize('udf1', this._udf1, 256);
+    this.validateSize('udf2', this._udf2, 256);
+    this.validateSize('udf3', this._udf3, 256);
+    this.validateSize('udf4', this._udf4, 256);
+    this.validateSize('udf5', this._udf5, 256);
+    this.validateSize('udf6', this._udf6, 256);
+    this.validateSize('udf7', this._udf7, 256);
+    this.validateSize('udf8', this._udf8, 256);
+    this.validateSize('udf9', this._udf9, 256);
+    this.validateSize('udf10', this._udf10, 256);
+    this.validateSizeAndPattern('udf11', this._udf11, 50);
+    this.validateSizeAndPattern('udf12', this._udf12, 50);
+    this.validateSizeAndPattern('udf13', this._udf13, 50);
+    this.validateSizeAndPattern('udf14', this._udf14, 50);
+    this.validateSizeAndPattern('udf15', this._udf15, 50);
     return new MetaInfo(
       this._udf1,
       this._udf2,
@@ -184,5 +199,25 @@ class MetaInfoBuilder {
       this._udf14,
       this._udf15
     );
+  };
+
+  private validateSize = (field: string, value: string | undefined, max: number): void => {
+    if (value !== undefined && value.length > max) {
+      throw new Error(`${field} exceeds maximum allowed size of ${max} characters`);
+    }
+  };
+
+  private static readonly RESTRICTED_PATTERN = /^[a-zA-Z0-9_\- @.+]*$/;
+
+  private validateSizeAndPattern = (field: string, value: string | undefined, max: number): void => {
+    if (value === undefined) return;
+    if (value.length > max) {
+      throw new Error(`${field} exceeds maximum allowed size of ${max} characters`);
+    }
+    if (!MetaInfoBuilder.RESTRICTED_PATTERN.test(value)) {
+      throw new Error(
+        `${field} should only contain alphanumeric characters, underscores, hyphens, spaces, @, ., and +`
+      );
+    }
   };
 }
