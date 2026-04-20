@@ -138,7 +138,8 @@ export class CustomCheckoutClient extends BaseClient {
       ? { ...this.headers, [Headers.X_DEVICE_OS]: payRequest.deviceOS }
       : this.headers;
     const isPciInstrument = (request: CustomCheckoutPayRequest): boolean => {
-      const type = (request.paymentFlow as PgPaymentFlow)?.paymentMode?.type;
+      if (!(request.paymentFlow instanceof PgPaymentFlow)) return false;
+      const type = request.paymentFlow.paymentMode?.type;
       return type === PgV2InstrumentType.CARD || type === PgV2InstrumentType.TOKEN;
     };
     const request = isPciInstrument(payRequest)

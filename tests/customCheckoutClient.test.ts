@@ -49,10 +49,8 @@ describe('CUSTOM_CHECKOUT: PCI HOST ROUTING TESTS', () => {
 
     mock.onPost(pciPayUrl).reply(200, mockPayResponse);
 
-    try {
-      const response = await client.pay(payRequest);
-      expect(response).toBeDefined();
-    } catch (error) {}
+    const response = await client.pay(payRequest);
+    expect(response).toBeDefined();
 
     const payCall = mock.history.post.find((call) => call.url === pciPayUrl);
     expect(payCall).toBeDefined();
@@ -75,10 +73,8 @@ describe('CUSTOM_CHECKOUT: PCI HOST ROUTING TESTS', () => {
 
     mock.onPost(pciPayUrl).reply(200, mockPayResponse);
 
-    try {
-      const response = await client.pay(payRequest);
-      expect(response).toBeDefined();
-    } catch (error) {}
+    const response = await client.pay(payRequest);
+    expect(response).toBeDefined();
 
     const payCall = mock.history.post.find((call) => call.url === pciPayUrl);
     expect(payCall).toBeDefined();
@@ -95,10 +91,8 @@ describe('CUSTOM_CHECKOUT: PCI HOST ROUTING TESTS', () => {
 
     mock.onPost(defaultPayUrl).reply(200, mockPayResponse);
 
-    try {
-      const response = await client.pay(payRequest);
-      expect(response).toBeDefined();
-    } catch (error) {}
+    const response = await client.pay(payRequest);
+    expect(response).toBeDefined();
 
     const payCall = mock.history.post.find((call) => call.url === defaultPayUrl);
     expect(payCall).toBeDefined();
@@ -116,9 +110,7 @@ describe('CUSTOM_CHECKOUT: PCI HOST ROUTING TESTS', () => {
 
     mock.onPost(defaultPayUrl).reply(200, mockPayResponse);
 
-    try {
-      await client.pay(payRequest);
-    } catch (error) {}
+    await client.pay(payRequest);
 
     const payCall = mock.history.post.find((call) => call.url === defaultPayUrl);
     expect(payCall!.headers![Headers.X_DEVICE_OS]).toEqual('ANDROID');

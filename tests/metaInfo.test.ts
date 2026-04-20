@@ -98,3 +98,74 @@ describe('MetaInfo: BUILDER TESTS', () => {
     expect(metaInfo.udf15).toBe('fifteen');
   });
 });
+
+describe('MetaInfo: VALIDATION TESTS', () => {
+  const str = (len: number) => 'a'.repeat(len);
+
+  describe('udf1-udf10: size limit of 256', () => {
+    it('accepts exactly 256 characters (boundary)', () => {
+      const val = str(256);
+      expect(() => MetaInfo.builder().udf1(val).build()).not.toThrow();
+      expect(() => MetaInfo.builder().udf10(val).build()).not.toThrow();
+    });
+
+    it.each([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])(
+      'throws when udf%i exceeds 256 characters',
+      (n) => {
+        const builder = MetaInfo.builder();
+        (builder as any)[`udf${n}`](str(257));
+        expect(() => builder.build()).toThrow(`udf${n} exceeds maximum allowed size of 256 characters`);
+      }
+    );
+  });
+
+  describe('udf11-udf15: size limit of 50', () => {
+    it('accepts exactly 50 characters (boundary)', () => {
+      const val = str(50);
+      expect(() => MetaInfo.builder().udf11(val).build()).not.toThrow();
+      expect(() => MetaInfo.builder().udf15(val).build()).not.toThrow();
+    });
+
+    it.each([11, 12, 13, 14, 15])(
+      'throws when udf%i exceeds 50 characters',
+      (n) => {
+        const builder = MetaInfo.builder();
+        (builder as any)[`udf${n}`](str(51));
+        expect(() => builder.build()).toThrow(`udf${n} exceeds maximum allowed size of 50 characters`);
+      }
+    );
+  });
+
+  describe('udf11-udf15: restricted character pattern', () => {
+    it.each(['$', '!', '#', '%', '^', '&', '*', '(', ')', '[', ']', '{', '}', '|', '\\', '/', '<', '>',  '?', '`', '~', ',', ';', ':', "'", '"'])(
+      'throws when udf11 contains invalid character "%s"',
+      (invalidChar) => {
+        expect(() =>
+          MetaInfo.builder().udf11(`invalid${invalidChar}value`).build()
+        ).toThrow('udf11 should only contain alphanumeric characters');
+      }
+    );
+
+    it('accepts all allowed special characters: _ - (space) @ . +', () => {
+      const val = 'Valid_Value-With @.+chars';
+      expect(() => MetaInfo.builder().udf11(val).build()).not.toThrow();
+      expect(() => MetaInfo.builder().udf15(val).build()).not.toThrow();
+    });
+  });
+
+  describe('validation applies to direct constructor calls (not just builder)', () => {
+    it('throws when udf1 exceeds 256 chars via constructor', () => {
+      expect(() => new MetaInfo(str(257))).toThrow('udf1 exceeds maximum allowed size of 256 characters');
+    });
+
+    it('throws when udf11 exceeds 50 chars via constructor', () => {
+      expect(() => new MetaInfo(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, str(51)))
+        .toThrow('udf11 exceeds maximum allowed size of 50 characters');
+    });
+
+    it('throws when udf11 has invalid characters via constructor', () => {
+      expect(() => new MetaInfo(undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, undefined, 'bad$value'))
+        .toThrow('udf11 should only contain alphanumeric characters');
+    });
+  });
+});
