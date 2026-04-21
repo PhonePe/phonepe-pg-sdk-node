@@ -19,15 +19,18 @@ import { Env } from './Env';
 
 export class EnvConfig {
   private _pgHostUrl: string;
+  private _pciPgHostUrl: string;
   private _oAuthHostUrl: string;
   private _eventsHostUrl: string;
 
   private constructor(
     pgHostUrl: string,
+    pciPgHostUrl: string,
     oAuthHostUrl: string,
     eventsHostUrl: string
   ) {
     this._pgHostUrl = pgHostUrl;
+    this._pciPgHostUrl = pciPgHostUrl;
     this._oAuthHostUrl = oAuthHostUrl;
     this._eventsHostUrl = eventsHostUrl;
   }
@@ -36,12 +39,14 @@ export class EnvConfig {
     if (Object.prototype.hasOwnProperty.call(BaseUrl, envType))
       return new EnvConfig(
         BaseUrl[envType].PG_HOST_URL,
+        BaseUrl[envType].PCI_PG_HOST_URL,
         BaseUrl[envType].OAUTH_HOST_URL,
         BaseUrl[envType].EVENTS_HOST_URL
       );
 
     return new EnvConfig(
       BaseUrl[Env.SANDBOX].PG_HOST_URL,
+      BaseUrl[Env.SANDBOX].PCI_PG_HOST_URL,
       BaseUrl[Env.SANDBOX].OAUTH_HOST_URL,
       BaseUrl[Env.SANDBOX].EVENTS_HOST_URL
     );
@@ -49,6 +54,10 @@ export class EnvConfig {
 
   get pgHostUrl(): string {
     return this._pgHostUrl;
+  }
+
+  get pciPgHostUrl(): string {
+    return this._pciPgHostUrl;
   }
 
   get oAuthHostUrl(): string {

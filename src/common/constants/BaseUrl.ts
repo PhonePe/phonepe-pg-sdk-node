@@ -17,11 +17,13 @@
 export const BaseUrl = {
   PRODUCTION: {
     PG_HOST_URL: 'https://api.phonepe.com/apis/pg',
+    PCI_PG_HOST_URL: 'https://cards.phonepe.com/apis/pg',
     OAUTH_HOST_URL: 'https://api.phonepe.com/apis/identity-manager',
     EVENTS_HOST_URL: 'https://api.phonepe.com/apis/pg-ingestion',
   },
   SANDBOX: {
     PG_HOST_URL: 'https://api-preprod.phonepe.com/apis/pg-sandbox',
+    PCI_PG_HOST_URL: 'https://api-preprod.phonepe.com/apis/pg-sandbox',
     OAUTH_HOST_URL: 'https://api-preprod.phonepe.com/apis/pg-sandbox',
     EVENTS_HOST_URL: 'http://localhost',
   },
