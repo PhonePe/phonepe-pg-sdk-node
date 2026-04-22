@@ -29,7 +29,7 @@
     "url": "https://github.com/PhonePe/phonepe-pg-sdk-node.git"
   },
   "devDependencies": {
-    "@types/jest": "^28.1.1",
+    "@types/jest": "^29.5.14",
     "@types/node": "^12.12.6",
     "@types/uuid": "^3.4.4",
     "@typescript-eslint/eslint-plugin": "^5.62.0",
