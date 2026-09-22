@@ -51,6 +51,50 @@ describe('Validate Callback', () => {
     expect(result).toEqual(expected);
   });
 
+  it('StandardCheckout Client validateCallback with CREDIT_LINE instrument (providerAccountType)', () => {
+    const { client } = standardCheckoutClient();
+
+    const username = 'username';
+    const password = 'password';
+
+    const authorization =
+      'bc842c31a9e54efe320d30d948be61291f3ceee4766e36ab25fa65243cd76e0e';
+
+    const responseBody =
+      '{"type":"CHECKOUT_ORDER_COMPLETED","payload":{"orderId":"OMOxx","state":"COMPLETED","amount":100,"expireAt":238462442,"paymentDetails":[{"paymentMode":"UPI_INTENT","transactionId":"transactionId","state":"COMPLETED","instrument":{"type":"CREDIT_LINE","ifsc":"ifsc","bankId":"bankId","providerAccountType":"CREDITLINE"}}]}}';
+
+    const result = client.validateCallback(
+      username,
+      password,
+      authorization,
+      responseBody
+    );
+    const expected = {
+      type: 'CHECKOUT_ORDER_COMPLETED',
+      payload: {
+        orderId: 'OMOxx',
+        state: 'COMPLETED',
+        amount: 100,
+        expireAt: 238462442,
+        paymentDetails: [
+          {
+            paymentMode: 'UPI_INTENT',
+            transactionId: 'transactionId',
+            state: 'COMPLETED',
+            instrument: {
+              type: 'CREDIT_LINE',
+              ifsc: 'ifsc',
+              bankId: 'bankId',
+              providerAccountType: 'CREDITLINE',
+            },
+          },
+        ],
+      },
+    };
+
+    expect(result).toEqual(expected);
+  });
+
   it('CustomCheckout Client validateCallback with correct credentials', () => {
     const { client } = customCheckoutClient();
 

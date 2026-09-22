@@ -21,4 +21,5 @@ export enum PaymentInstrumentType {
   CREDIT_CARD = 'CREDIT_CARD',
   DEBIT_CARD = 'DEBIT_CARD',
   NET_BANKING = 'NET_BANKING',
+  CREDIT_LINE = 'CREDIT_LINE',
 }
