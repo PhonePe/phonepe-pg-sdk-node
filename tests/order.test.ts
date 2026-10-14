@@ -149,6 +149,54 @@ describe('STANDARD_CHECKOUT: ORDER_STATUS', () => {
     }
   });
 
+  it('Order Status With Credit Line Instrument (providerAccountType)', async () => {
+    const mockOrderResponse = {
+      orderId: 'orderId',
+      state: 'COMPLETED',
+      expireAt: 238462442,
+      amount: 100,
+      paymentDetails: [
+        {
+          paymentMode: 'UPI_INTENT',
+          transactionId: 'transactionId',
+          state: 'COMPLETED',
+          instrument: {
+            type: 'CREDIT_LINE',
+            ifsc: 'ifsc',
+            bankId: 'bankId',
+            providerAccountType: 'CREDITLINE',
+          },
+          rail: {
+            type: 'UPI',
+            utr: 'utr',
+          },
+          splitInstruments: [
+            {
+              instrument: {
+                type: 'CREDIT_LINE',
+                ifsc: 'ifsc',
+                bankId: 'bankId',
+                providerAccountType: 'CREDITLINE',
+              },
+              rail: {
+                type: 'UPI',
+                utr: 'utr',
+              },
+              amount: 100,
+            },
+          ],
+        },
+      ],
+    };
+
+    mock.onGet(`${hostUrl}${url}?details=true`).reply(200, mockOrderResponse);
+
+    const result = await client.getOrderStatus(orderId, true);
+
+    expect(result).toEqual(mockOrderResponse);
+    expect(result.paymentDetails[0].instrument?.type).toEqual('CREDIT_LINE');
+  });
+
   it('Order Status Failed Due To Wrong Order ID', async () => {
     const mockError = {
       code: 'MERCHANT_ORDER_MAPPING_NOT_FOUND',

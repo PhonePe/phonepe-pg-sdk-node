@@ -24,4 +24,6 @@ export class AccountPaymentInstrumentV2 extends PaymentInstrumentV2 {
   public accountHolderName?: string;
   public accountType?: string;
   public unmaskedAccountNumber?: string;
+  public bankId?: string;
+  public providerAccountType?: string;
 }
